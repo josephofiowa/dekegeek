@@ -1,4 +1,4 @@
-# [logo](https://raw.githubusercontent.com/josephnelson93/dekegeek/master/boshac16/assets/images/logo.png) BOSHAC 2016
+# ![logo](https://raw.githubusercontent.com/josephnelson93/dekegeek/master/boshac16/assets/images/logo.png) BOSHAC 2016
 
 The [Babson Hockey Analytics Conference](http://statsportsconsulting.com/boshac2016/) is the first hockey-only sports analytics conference hosted in Boston. ([#BOSHAC](https://twitter.com/hashtag/BOSHAC) on Twitter)
 
