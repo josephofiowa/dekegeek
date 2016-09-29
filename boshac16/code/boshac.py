@@ -111,7 +111,7 @@ stat_5v5_cols = ['corsi_for_5v5','corsi_against_5v5','corsi_5v5',
 
 
 
-
+    
 
 blocks.head()
 

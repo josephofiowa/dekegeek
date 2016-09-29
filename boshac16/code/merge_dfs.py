@@ -80,6 +80,7 @@ cols = [g_block_5_all,b_block_5_all,g_block_10_all,b_block_10_all,g_hit_5_all,b_
 col_names = ['g_block_5_all','b_block_5_all','g_block_10_all','b_block_10_all','g_hit_5_all','b_hit_5_all','g_hit_10_all','b_hit_10_all']
 for col_name,col in zip(col_names,cols):
     calc_df[col_name] = col
+    
 # Calculate the stat/60 for each of these
 calc_df['TOI'] = combined['TOI']
 for col in col_names:
