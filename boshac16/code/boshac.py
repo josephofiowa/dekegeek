@@ -162,6 +162,9 @@ dmen.to_csv('./assets/data/20152016_02_stats60_dmen.csv')
 data['recovery'] = ((data['b_block_5_5v5']+data['b_hit_5_5v5'])/data['5v5_give'])
 data.recovery.plot(kind='hist', bins=30)
 
+# top recovery leaders
+data[(data.pos == 'D') & (data.GP >= 60)].sort('recovery', ascending=False).head(15)
+
 # check for more b bl or b hit within giveaways
 
 # reset index on data
@@ -177,6 +180,7 @@ data['5v5_give'][1]
 # EDA
 sns.distplot(dmen['b_block_5_5v5/60'])
 sns.distplot(dmen['5v5_give/60'])
+
 
 # pairplots
 sns.lmplot(x='b_block_5_5v5/60', y='corsi_5v5/60', data=dmen, aspect=1.5, scatter_kws={'alpha':0.2})
@@ -203,19 +207,77 @@ def linreg(X,y):
     print('R-squared score: %.2f' % linreg.score(X_test, y_test))
     
 # baseline
-X = dmen[['5v5_hits/60']]*dmen[['5v5_hits/60']]
-y = dmen['corsi_5v5/60']
+X = dmen[['5v5_hits/60']]
+y = dmen['fenwick_5v5/60']
 linreg(X,y)
+
+# try polyfit on fenwick
+degree=5
+X = dmen['5v5_hits/60']                     # fit on array
+poly = np.polyfit(X.tolist(),y,deg=degree)
+p = np.poly1d(poly)
+
+# plot
+xp = np.linspace(-2, 20, 100)
+plt.plot(X, y, '.', xp, p(xp), '-', xp, p(xp), '--')
+plt.xlabel('5v5 Hits per 60')
+plt.ylabel('Fenwick 5v5')
+plt.title("Defenseman's Paradox")
+plt.savefig('./assets/images/Hitss_vs_Fenwick.png')
+
+# dropping Mark Borowiecki (outlier) and double checking
+dmen[dmen['5v5_hits/60']>18]
+X = dmen[dmen['5v5_hits/60']<18]['5v5_hits/60']
+y = dmen[dmen['5v5_hits/60']<18]['fenwick_5v5/60']
+
+poly = np.polyfit(X.tolist(),y,deg=degree)
+p = np.poly1d(poly)
+# plot
+xp = np.linspace(-2, 20, 100)
+plt.plot(X, y, '.', xp, p(xp), '-', xp, p(xp), '--')
+plt.xlim(min(X), max(X))
+
+
+# baseline for blocks
+X = dmen['5v5_block/60']
+y = dmen['fenwick_5v5/60']
+poly = np.polyfit(X.tolist(),y,deg=3)
+p = np.poly1d(poly)
+
+# plot
+xp = np.linspace(-2, 20, 100)
+plt.plot(X, y, '.', xp, p(xp), '-', xp, p(xp), '--')
+plt.xlabel('5v5 Blocked Shots per 60')
+plt.ylabel('Fenwick 5v5')
+plt.title("Defenseman's Paradox")
+plt.xlim(min(X), max(X))
+plt.ylim(min(y), max(y))
+plt.savefig('./assets/images/Blocks_vs_Fenwick.png')
 
 # bad blocked shots
 X = dmen[['b_block_5_5v5/60']]
 y = dmen['corsi_5v5/60']
 linreg(X,y)
 
-# sdf
+# polyfit
+degree=2
+X = dmen['b_block_5_5v5/60']                     # fit on array
+y = dmen['fenwick_5v5/60']
+poly = np.polyfit(X.tolist(),y,deg=degree)
+p = np.poly1d(poly)
+
+# plot
+xp = np.linspace(-2, 20, 100)
+plt.plot(X, y, '.', xp, p(xp), '-', xp, p(xp), '--')
+plt.xlim(-.1, .35)
+plt.ylim(min(y-1), max(y+1))
+
+
+# good blocked shots only in presence of giveaway
 X = dmen[['b_block_5_5v5/60']]
 y = dmen['5v5_give/60']
 linreg(X,y)
+
 
 # statsmodels
 import statsmodels.api as sm
@@ -227,3 +289,18 @@ results = sm.OLS(y,sm.add_constant(X)).fit()
 
 print results.summary()
 
+brian = pd.read_csv('final_20152016.csv')
+
+# scale this data
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaler.fit(brian['b_bh_5_5v5/60'])
+bad_scaled = scaler.transform(brian['b_bh_5_5v5/60'])
+
+
+scaler.fit(brian['5v5_give/60'])
+give_scaled = scaler.transform(brian['5v5_give/60'])
+
+brian['b_bh_5_5v5/60_scaled'] = bad_scaled
+brian['5v5_give/60'] = give_scaled
+brian.to_csv('brian.csv')
