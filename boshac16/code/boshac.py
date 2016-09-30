@@ -4,6 +4,7 @@ Created on Sat Sep 24 18:25:22 2016
 
 @author: JosephNelson
 """
+import pandas as pd
 
 # loading data
 blocks = pd.read_csv('./assets/data/20152016_02_total_blocks.csv')
@@ -70,10 +71,10 @@ data.shape
 # save dat ish
 data.to_csv('./assets/data/20152016_02_merged.csv',index=False)
 
-# remove goalies
-data = data.ix[data.pos != 'G']
 
 # raw inquisitivity
+import seaborn as sns
+
 sns.pairplot(data, x_vars=['giveaways', 'takeaways'], y_vars='hits')
 sns.pairplot(data, x_vars=['giveaways', 'takeaways', 'hits', 'blocks'], y_vars='corsi')
 
@@ -87,37 +88,59 @@ def convert_to_60(time):
     secs = secs/60.0
     converted_mins = mins + secs
     return converted_mins/60.0
+    
+# remove goalies
+data = data.ix[data.pos != 'G']
 
 # Convert our TOI columns to number of 60 minutes intervals
-data['TOI'] = data['TOI'].apply(convert_to_60)
-data['TOI_5v5'] = data['TOI_5v5'].apply(convert_to_60)
+data.ix[:,'TOI'] = data['TOI'].apply(convert_to_60)
+data.ix[:,'TOI_5v5'] = data['TOI_5v5'].apply(convert_to_60)
 
 # Create a new DataFrame for our stats per 60 mins of TOI
 stats_60 = pd.DataFrame()
 
 # Copy over the player information and their TOI info
 for col in ['last','first','pos','num','GP','TOI','TOI_5v5']:
-    stats_60[col] = combined[col]
+    stats_60[col] = data[col]
 
 # grab new cols
 stat_5v5_cols = ['corsi_for_5v5','corsi_against_5v5','corsi_5v5',
                  'fenwick_for_5v5','fenwick_against_5v5','fenwick_5v5',
                  '5v5_block','g_block_5_5v5','b_block_5_5v5','g_block_10_5v5',
                  'b_block_10_5v5','g_block_5_ev','5v5_hits','g_hit_5_5v5',
-                 'b_hit_5_5v5','g_hit_10_5v5','b_hit_10_5v5']
-
+                 'b_hit_5_5v5','g_hit_10_5v5','b_hit_10_5v5', '5v5_goal',
+                 '5v5_shot', '5v5_give', '5v5_take']
 
 # Need to use TOI to produce all 5v5 stats relative to their /60min of play
+for col in stat_5v5_cols:
+    stats_60[col+'/60'] = data[col]/stats_60['TOI_5v5']
 
+# save the /60 dataset by itself
+stats_60.to_csv('./assets/data/20152016_02_stats60.csv')
 
+# filter to only 20 games played individuals
+stats_60.GP
+stats_60[stats_60.GP >= 20].head()
+stats_60[stats_60.GP >= 20].shape          # 898 players
 
-    
+# only defensemen
+stats_60[(stats_60.GP >= 20) & (stats_60.pos == 'D')].shape
+dmen = stats_60[(stats_60.GP >= 20) & (stats_60.pos == 'D')] # new df
 
-blocks.head()
+dmen.head()
+dmen['b_hit_shot_5_5v5/60']= dmen['b_hit_5_5v5/60'] + dmen['b_block_5_5v5/60']
+
+# scale this data
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaler.fit(dmen['b_hit_shot_5_5v5/60'])
+bad_scaled = scaler.transform(dmen['b_hit_shot_5_5v5/60'])
+
+dmen['5v5_give/60']
+scaler.fit(dmen['5v5_give/60'])
+give_scaled = scaler.transform(dmen['5v5_give/60'])
 
 import matplotlib.pyplot as plt
-import seaborn as sns
-
 # display plots in the notebook
 %matplotlib inline
 
@@ -125,10 +148,82 @@ import seaborn as sns
 plt.rcParams['figure.figsize'] = (8, 6)
 plt.rcParams['font.size'] = 14
 
-blocks['blocks'].plot(kind='hist', bins=3)
-sns.distplot(blocks['blocks'])
-plt.savefig('blocks.png')
+# plot this
+plt.scatter(bad_scaled, give_scaled)
 
-type(blocks.g_block_10_ev)
+# put back into the df to plot with Tableau
+dmen.ix[:,'b_hit_shot_5_5v5/60_scaled'] = bad_scaled
+dmen.ix[:,'5v5_give/60_scaled'] = give_scaled
 
-shots.comb
+# export
+dmen.to_csv('./assets/data/20152016_02_stats60_dmen.csv')
+
+#  compute recovery: the number of times a player 
+data['recovery'] = ((data['b_block_5_5v5']+data['b_hit_5_5v5'])/data['5v5_give'])
+data.recovery.plot(kind='hist', bins=30)
+
+# check for more b bl or b hit within giveaways
+
+# reset index on data
+data.reset_index(inplace=True, drop=True)
+
+# check for cases where there are more bad blocked shots than giveaways
+for i in data.ix[:,'b_hit_5_5v5']:
+    if i > data.ix[i,'5v5_give']:
+        print i
+data['5v5_give'][1]
+
+    
+# EDA
+sns.distplot(dmen['b_block_5_5v5/60'])
+sns.distplot(dmen['5v5_give/60'])
+
+# pairplots
+sns.lmplot(x='b_block_5_5v5/60', y='corsi_5v5/60', data=dmen, aspect=1.5, scatter_kws={'alpha':0.2})
+
+# linreg with sklearn
+from sklearn.linear_model import LinearRegression
+
+# tts
+from sklearn.cross_validation import train_test_split
+import numpy as np
+def linreg(X,y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=123)
+    linreg = LinearRegression()
+    linreg.fit(X_train, y_train)
+    y_pred = linreg.predict(X_test)
+    
+    plt.scatter(X_test, y_test,  color='black')
+    plt.plot(X_test, linreg.predict(X_test), color='blue',
+             linewidth=3)
+    print("Coefficients: ", linreg.coef_)
+    # The mean squared error
+    print("Mean squared error: %.2f"%np.mean((linreg.predict(X_test) - y_test) ** 2))
+    # Explained variance score: 1 is perfect prediction
+    print('R-squared score: %.2f' % linreg.score(X_test, y_test))
+    
+# baseline
+X = dmen[['5v5_hits/60']]*dmen[['5v5_hits/60']]
+y = dmen['corsi_5v5/60']
+linreg(X,y)
+
+# bad blocked shots
+X = dmen[['b_block_5_5v5/60']]
+y = dmen['corsi_5v5/60']
+linreg(X,y)
+
+# sdf
+X = dmen[['b_block_5_5v5/60']]
+y = dmen['5v5_give/60']
+linreg(X,y)
+
+# statsmodels
+import statsmodels.api as sm
+
+X = dmen[['5v5_hits/60']]*dmen[['5v5_hits/60']]
+y = dmen['corsi_5v5/60']
+
+results = sm.OLS(y,sm.add_constant(X)).fit()
+
+print results.summary()
+
