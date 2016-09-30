@@ -223,7 +223,7 @@ plt.plot(X, y, '.', xp, p(xp), '-', xp, p(xp), '--')
 plt.xlabel('5v5 Hits per 60')
 plt.ylabel('Fenwick 5v5')
 plt.title("Defenseman's Paradox")
-plt.savefig('./assets/images/Hitss_vs_Fenwick.png')
+plt.savefig('./assets/images/Hits_vs_Fenwick.png')
 
 # dropping Mark Borowiecki (outlier) and double checking
 dmen[dmen['5v5_hits/60']>18]
