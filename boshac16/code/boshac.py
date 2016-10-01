@@ -158,12 +158,32 @@ dmen.ix[:,'5v5_give/60_scaled'] = give_scaled
 # export
 dmen.to_csv('./assets/data/20152016_02_stats60_dmen.csv')
 
+
 #  compute recovery: the number of times a player 
 data['recovery'] = ((data['b_block_5_5v5']+data['b_hit_5_5v5'])/data['5v5_give'])
 data.recovery.plot(kind='hist', bins=30)
 
 # top recovery leaders
-data[(data.pos == 'D') & (data.GP >= 60)].sort('recovery', ascending=False).head(15)
+data[(data.pos == 'D') & (data.GP >= 20)].sort('recovery', ascending=False).head(50)
+data['recovery'].describe()
+
+
+# figure out stat
+data[(data.GP >= 20) & (data.pos == 'D')]['recovery'].describe()
+
+# EDA of recovery stat
+#recovery histogram & distplot
+data[(data.GP >= 20) & (data.pos == 'D')]['recovery'].plot(kind='hist', bins=20)
+sns.distplot(data[(data.GP >= 20) & (data.pos == 'D')]['recovery'])
+
+data[(data.GP >= 20) & (data.pos == 'D')]['recovery'].plot(kind='hist', bins=20)
+
+# recovery relationship with GP
+plt.scatter(data[(data.GP >= 20) & (data.pos == 'D')]['recovery'], data[(data.GP >= 20) & (data.pos == 'D')]['GP'])
+
+# recovery relationship with Fenwick
+plt.scatter(data[(data.GP >= 20) & (data.pos == 'D')]['recovery'], data[(data.GP >= 20) & (data.pos == 'D')]['fenwick_5v5'])
+
 
 # check for more b bl or b hit within giveaways
 
