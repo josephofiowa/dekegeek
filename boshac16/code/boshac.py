@@ -130,6 +130,23 @@ dmen = stats_60[(stats_60.GP >= 20) & (stats_60.pos == 'D')] # new df
 dmen.head()
 dmen['b_hit_shot_5_5v5/60']= dmen['b_hit_5_5v5/60'] + dmen['b_block_5_5v5/60']
 
+# "traditionally" strong defensemen
+dmen.columns
+dmen['5v5_block/60']
+dmen.sort('5v5_block/60', ascending=False).head(10)
+dmen.sort('5v5_hits/60', ascending=False).head(10)
+
+
+data[(data.pos == 'D') & (data.GP >= 20)].sort('5v5_block', ascending=False).head(10)
+data[(data.pos == 'D') & (data.GP >= 20)].sort('5v5_hits', ascending=False).head(10)
+
+# new way of strong defensemen
+data[(data.pos == 'D') & (data.GP >= 20)].sort('fenwick_5v5', ascending=False).head(10)
+
+
+plt.scatter(data[(data.GP >= 20) & (data.pos == 'D')]['recovery'], data[(data.GP >= 20) & (data.pos == 'D')]['GP'])
+
+
 # scale this data
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
@@ -164,8 +181,7 @@ data['recovery'] = ((data['b_block_5_5v5']+data['b_hit_5_5v5'])/data['5v5_give']
 data.recovery.plot(kind='hist', bins=30)
 
 # top recovery leaders
-data[(data.pos == 'D') & (data.GP >= 20)].sort('recovery', ascending=False).head(50)
-data['recovery'].describe()
+data[(data.pos == 'D') & (data.GP >= 20)].sort('recovery', ascending=False).head(15)
 
 
 # figure out stat
@@ -183,7 +199,12 @@ plt.scatter(data[(data.GP >= 20) & (data.pos == 'D')]['recovery'], data[(data.GP
 
 # recovery relationship with Fenwick
 plt.scatter(data[(data.GP >= 20) & (data.pos == 'D')]['recovery'], data[(data.GP >= 20) & (data.pos == 'D')]['fenwick_5v5'])
+data[(data.GP >= 20) & (data.pos == 'D')]['recovery'].plot(kind='box')
+plt.savefig('./assets/images/recovery-box.png')
+plt.title('Recovery 2015-2016')
 
+# Jeff Petry
+data[data['last']=='PETRY']
 
 # check for more b bl or b hit within giveaways
 
