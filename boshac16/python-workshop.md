@@ -83,6 +83,10 @@ How does the server know what the request is asking for? This is specified by th
 
 We'll walkthrough how sending a request works by making use of the OMDB API.
 
+Visit the OMDB API page [here](www.omdbapi.com).
+
+Grab this [code]((./code/api-usage-example.py)) or follow along.
+
 
 ## Deconstructing www.stats.hockeyanalysis.com
 
