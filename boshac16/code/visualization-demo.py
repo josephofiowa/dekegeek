@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Updated on Sat Oct  1 15:00:58 2016
-
 @author: JosephNelson
 """
 
@@ -25,7 +24,7 @@ data.head()
 data.columns
 
 # make initial plot
-data['goals'].plot(kind='hist', bins=3)
+data['goals'].plot(kind='hist', bins=20)
 data[data['GP']>20]['goals'].plot(kind='hist', bins=20)
 data[data['GP']>20]['5v5_goal'].plot(kind='hist', bins=20)
 
@@ -38,7 +37,7 @@ plt.ylabel('Frequency')
 plt.style.available
 
 # change to a different style
-plt.style.use('ggplot')
+plt.style.use('fivethirtyeight')
 
 # use seaborn to make a distribution plot
 sns.distplot(data[data['GP']>20]['5v5_goal'])
@@ -47,4 +46,15 @@ sns.distplot(data[data['GP']>20]['5v5_goal'])
 data[data['GP']>20].plot(kind='scatter', x=['fenwick_5v5'], y=['5v5_goal'], alpha=0.3)
 
 # multiple scatter
-sns.pairplot(data[data['GP']>20], x_vars=['giveaways', 'takeaways'], y_vars='hits')
+sns.pairplot(data[(data['GP']>20) & (data['pos']=='C')], x_vars=['giveaways', 'takeaways'], y_vars='hits')
+
+
+# eliminate goalies
+data[(data['GP']>20) & (data['pos'] == 'C')].head()
+
+#regression and plot -- called lmplot()
+sns.lmplot(data=data[(data['GP']>20) & (data['pos']=='C')], x='fenwick_5v5', y='5v5_goal')
+
+# optional save
+sns.lmplot(data=data[(data['GP']>20) & (data['pos']=='C')], x='fenwick_5v5', y='5v5_goal')
+plt.savefig('fenwick_vs_goals.png')

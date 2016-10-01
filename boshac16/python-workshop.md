@@ -90,8 +90,13 @@ Grab this [code]((./code/api-usage-example.py)) or follow along.
 
 ## Deconstructing www.stats.hockeyanalysis.com
 
-Brian will walkthrough how to identify elements
+Brian will walkthrough how to identify elements.
 
+His code is available [here](https://github.com/josephofiowa/dekegeek/blob/master/boshac16/code/scraping_example.py).
+
+## Visualization Examples
+
+The code we discussed to make visualization is available [here](./code/visualization-demo.py).
 
 
 ## ADDITIONAL RESOURCES
