@@ -3,3 +3,9 @@
 The [Babson Hockey Analytics Conference](http://statsportsconsulting.com/boshac2016/) is the first hockey-only sports analytics conference hosted in Boston. ([#BOSHAC](https://twitter.com/hashtag/BOSHAC) on Twitter)
 
 Brian Carothers ([bcarothers19](https://github.com/bcarothers19)) and I are presenting on what we've branded the "Defenseman's Paradox." Traditionally, top defensive players were thought to be those that maximized the number of hits and blocked shots they could log. Posession-based statistics have successfully questioned whether this is the case: if you're a defensive player and logging a high number of blocked shots and hits, you are likely poor at maintaining the puck. Thus, we seek to find where too many hits and blocked shots may be deemed "too many" for any given defensive player and, subsequently, produce analysis that demonstrates the value-add of defense-only based play.
+
+The presentation we offered is [here](https://github.com/josephofiowa/dekegeek/blob/master/boshac16/assets/presentation/presentation.pdf).
+
+### Python Workshop
+
+We offered a Python workshop on basic web protocal (HTTP), how to scrape, and simple visualizations. Visit the readme for this lesson [here](https://github.com/josephofiowa/dekegeek/blob/master/boshac16/python-workshop.md).
