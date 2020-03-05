@@ -8,7 +8,7 @@ Here's a few projects we've worked on:
 
 Is Ovechkin on pace to break Ovechkin's goals record? [Matt Speck](https://github.com/mjspeck) and [Joseph Nelson](https://twitter.com/josephofiowa) are working on creating some visualizations to find out.
 
-More in the [gretzky-ovechkin](https://github.com/josephofiowa/dekegeek/tree/master/boshac16/gretzky-ovechkin) folder.
+More in the [gretzky-ovechkin](https://github.com/josephofiowa/dekegeek/tree/master/gretzky-ovechkin) folder.
 
 
 ## BOSHAC 2016
