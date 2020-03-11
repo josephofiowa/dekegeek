@@ -1,0 +1,4 @@
+pandas>=1.0.0
+requests>=2.22.0
+PyGithub>=1.46
+loguru>=0.4.1

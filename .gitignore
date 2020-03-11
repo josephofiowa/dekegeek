@@ -1,3 +1,6 @@
+# Ignore any file labeled secret
+*secret*
+
 .DS_Store
 .vscode
 
